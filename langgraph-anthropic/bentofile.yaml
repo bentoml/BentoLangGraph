@@ -1,0 +1,10 @@
+service: "service:LangGraphService"
+labels:
+  author: "bentoml-team"
+  project: "langgraph-example"
+include:
+  - "*.py"
+python:
+  requirements_txt: "./requirements.txt"
+envs:
+  - name: ANTHROPIC_API_KEY

@@ -1,3 +1,5 @@
 bentoml
 langgraph
 langchain-anthropic
+langchain-community
+duckduckgo-search

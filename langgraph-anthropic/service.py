@@ -1,8 +1,7 @@
 import bentoml
 from langchain_core.messages import HumanMessage
-from langgraph.checkpoint.memory import MemorySaver
 
-from workflow import workflow
+from agent import workflow
 
 @bentoml.service(
     workers=2,
@@ -14,22 +13,16 @@ from workflow import workflow
         "external_queue": True
     }
 )
-class LangGraphService:
+class SearchAgentService:
     def __init__(self):
-        # Initialize memory to persist state between graph runs
-        checkpointer = MemorySaver()
-
-        # This compiles it into a LangChain Runnable,
-        # meaning you can use it as you would any other runnable.
-        self.app = workflow.compile(checkpointer=checkpointer)
+        self.app = workflow.compile()
 
     @bentoml.task
-    def invoke(
+    async def invoke(
         self, 
-        input_query: str="what is the weather in sf",
+        input_query: str="What is the weather in San Francisco?",
     ) -> str:
-        final_state = self.app.invoke(
-            {"messages": [HumanMessage(content="what is the weather in sf")]},
-            config={"configurable": {"thread_id": 42}}
+        final_state = await self.app.ainvoke(
+            {"messages": [HumanMessage(content=input_query)]}
         )
         return final_state["messages"][-1].content

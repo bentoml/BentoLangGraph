@@ -1,4 +1,4 @@
-service: "service:LangGraphService"
+service: "service:SearchAgentService"
 labels:
   author: "bentoml-team"
   project: "langgraph-example"

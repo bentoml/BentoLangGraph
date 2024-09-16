@@ -4,20 +4,22 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.tools import tool
 from langgraph.graph import END, START, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
+from langchain_community.tools import DuckDuckGoSearchRun
+from langchain_core.messages import HumanMessage
 
 
-# Define the tools for the agent to use
+duckduckgo_search = DuckDuckGoSearchRun()
+
 @tool
 def search(query: str):
-    """Call to surf the web."""
-    # This is a placeholder, but don't tell the LLM that...
-    if "sf" in query.lower() or "san francisco" in query.lower():
-        return "It's 60 degrees and foggy."
-    return "It's 90 degrees and sunny."
-
+    """A wrapper around DuckDuckGo Search.
+    Useful for when you need to answer questions about current events, current weather, latest news, up-to-date information, etc. 
+    Input should be a search query.
+    """
+    res = duckduckgo_search.invoke({"query": query})
+    return [res]
 
 tools = [search]
-
 tool_node = ToolNode(tools)
 
 model = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0).bind_tools(tools)
@@ -64,3 +66,9 @@ workflow.add_conditional_edges(
 # We now add a normal edge from `tools` to `agent`.
 # This means that after `tools` is called, `agent` node is called next.
 workflow.add_edge("tools", 'agent')
+
+
+if __name__ == "__main__":
+    app = workflow.compile()
+    final_state = app.invoke({"messages": [HumanMessage(content="what is the weather in sf")]})
+    print(final_state["messages"][-1].content)

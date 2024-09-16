@@ -1,6 +1,14 @@
+import sys
+import argparse
+
 import bentoml
 
+parser = argparse.ArgumentParser(description="Client for LangGraph Service")
+parser.add_argument("--url", default="http://localhost:3000", help="Deployed URL of the service")
+parser.add_argument("--query", default="What's the latest LLM released by OpenAI?", help="Query to send to the service")
+args = parser.parse_args()
+
 if __name__ == "__main__":
-    client = bentoml.SyncHTTPClient("http://localhost:3000")
-    response = client.invoke("What's the weather in San Francisco?")
+    client = bentoml.SyncHTTPClient(args.url)
+    response = client.invoke(args.query)
     print(response)

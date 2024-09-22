@@ -6,7 +6,8 @@ include:
   - "*.py"
 python:
   requirements_txt: "./requirements.txt"
+  lock_packages: false
 envs:
-  - name: ANTHROPIC_API_KEY
+  - name: HF_TOKEN
 docker:
   python_version: 3.11

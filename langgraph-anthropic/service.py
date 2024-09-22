@@ -20,7 +20,7 @@ class SearchAgentService:
     @bentoml.task
     async def invoke(
         self, 
-        input_query: str="What is the weather in San Francisco?",
+        input_query: str="What is the weather in San Francisco today?",
     ) -> str:
         final_state = await self.app.ainvoke(
             {"messages": [HumanMessage(content=input_query)]}

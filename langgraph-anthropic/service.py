@@ -1,5 +1,6 @@
 import bentoml
 from langchain_core.messages import HumanMessage
+from typing import AsyncGenerator
 
 from agent import workflow
 
@@ -26,3 +27,14 @@ class SearchAgentService:
             {"messages": [HumanMessage(content=input_query)]}
         )
         return final_state["messages"][-1].content
+
+    @bentoml.api
+    async def debug(
+        self,
+        input_query: str="What is the weather in San Francisco today?",
+    ) -> AsyncGenerator[str, None]:
+        async for event in self.app.astream_events(
+            {"messages": [HumanMessage(content=input_query)]},
+            version="v2"
+        ):
+            yield str(event) + "\n"

@@ -124,3 +124,14 @@ class SearchAgentService:
             import traceback
             print(traceback.format_exc())
             return "I'm sorry, but I encountered an error while processing your request. Please try again later."
+
+    @bentoml.api
+    async def debug(
+        self,
+        input_query: str="What is the weather in San Francisco today?",
+    ) -> AsyncGenerator[str, None]:
+        async for event in self.app.astream_events(
+            {"messages": [HumanMessage(content=input_query)]},
+            version="v2"
+        ):
+            yield str(event) + "\n"

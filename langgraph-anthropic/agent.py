@@ -1,4 +1,4 @@
-from typing import Annotated, Literal, TypedDict
+from typing import Literal
 
 from langchain_anthropic import ChatAnthropic
 from langchain_core.tools import tool
@@ -16,6 +16,7 @@ def search(query: str):
     Useful for when you need to answer questions about current events, current weather, latest news, up-to-date information, etc. 
     Input should be a search query.
     """
+    print("### calling duckduckgo search")
     res = duckduckgo_search.invoke({"query": query})
     return [res]
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from _bentoml_sdk.service.factory import Service
@@ -11,8 +10,6 @@ from .protocol import ChatCompletionRequest, CompletionRequest, ErrorResponse
 
 T = t.TypeVar("T", bound=object)
 
-if t.TYPE_CHECKING:
-    from vllm import AsyncLLMEngine
 
 def openai_endpoints(
         model_id: str,
@@ -63,7 +60,6 @@ def openai_endpoints(
                 # `prometheus_client` won't cause import troubles
                 # That's also why we put these codes inside class's
                 # `__init__` function
-                import bentoml
 
                 from vllm.entrypoints.openai.serving_chat import OpenAIServingChat
                 from vllm.entrypoints.openai.serving_completion import OpenAIServingCompletion

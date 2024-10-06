@@ -1,4 +1,4 @@
-from typing import Annotated, Literal, TypedDict
+from typing import Literal
 
 import random
 import string
@@ -7,7 +7,7 @@ from langchain_core.tools import tool
 from langgraph.graph import END, START, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
 from langchain_community.tools import DuckDuckGoSearchRun
-from langchain_core.messages import HumanMessage, ToolMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 
 duckduckgo_search = DuckDuckGoSearchRun()
@@ -24,6 +24,7 @@ def search(query: str):
 tools = [search]
 tool_node = ToolNode(tools)
 
+# Standalone LLM deployed on BentoCloud for dev & debugging
 openai_api_base = "https://bentovllm-mistral-7-b-instruct-v-03-service-cwc7-d3767914.mt-guc1.bentoml.ai/v1"
 
 model = ChatOpenAI(

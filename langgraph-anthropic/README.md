@@ -14,8 +14,8 @@ This project implements a LangGraph agent powered by the Anthropic Claude 3.5 So
 This project is a reference implementation designed to be hackable. Download the source code and use it as a playground to build your own agent APIs:
 
 ```bash
-git clone https://github.com/bentoml/BentoAgents.git
-cd BentoAgents/langgraph-anthropic
+git clone https://github.com/bentoml/BentoLangGraph.git
+cd BentoLangGraph/langgraph-anthropic
 ```
 
 ## Run locally

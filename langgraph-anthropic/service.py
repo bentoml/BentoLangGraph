@@ -29,7 +29,7 @@ class SearchAgentService:
         return final_state["messages"][-1].content
 
     @bentoml.api
-    async def debug(
+    async def stream(
         self,
         input_query: str="What is the weather in San Francisco today?",
     ) -> AsyncGenerator[str, None]:

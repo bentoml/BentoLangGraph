@@ -103,9 +103,9 @@ Start development server that will auto reload when code changes:
 bentoml serve . --reload
 ```
 
-Get all event streams for debugging:
+Inspect all event streams:
 ```bash
-curl -X POST http://localhost:3000/debug \
+curl -X POST http://localhost:3000/stream \
    -H 'Content-Type: application/json' \
    -d '{"query": "what is the weather in San Francisco today?"}'
 

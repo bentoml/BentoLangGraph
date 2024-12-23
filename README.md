@@ -2,8 +2,9 @@
 
 This repo demonstrates how to serve LangGraph agent application with BentoML.
 
-## Overview
+See [here](https://docs.bentoml.com/en/latest/examples/overview.html) for a full list of BentoML example projects.
 
+## Overview
 
 - **AI Agent Serving**: Serving LangGraph Agent as REST API for easy integration
 - **Flexible Invocation**: Supports both synchronous and asynchronous (queue-based) interactions.
@@ -11,7 +12,6 @@ This repo demonstrates how to serve LangGraph agent application with BentoML.
 - **LLM Deployment**: Use external LLM APIs or deploy open-source LLM together with the Agent API service
 
 This project serves as a reference implementation designed to be hackable, providing a  foundation for building and customizing your own AI agent solutions. 
-
 
 ## Getting Started
 
@@ -25,7 +25,6 @@ Follow the step-by-step guide for serving & deploying LangGraph agents with Bent
 
 - [Anthropic Claude 3.5 Sonnet](langgraph-anthropic/)
 - [Mistral 7B Instruct](langgraph-mistral/)
-
 
 ## Troubleshoot
 
@@ -46,7 +45,6 @@ For example, you can use exa to replace DuckDuckGo for search:
 ```
 
 Interested in using LangGraph with other open-source LLMs? Checkout [BentoVLLM](https://github.com/bentoml/BentoVLLM) for more sample code.
-
 
 ## Community
 

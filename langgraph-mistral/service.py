@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import logging, typing, uuid, random, string
+import logging, typing, random, string, traceback
 
 import bentoml, fastapi
 
@@ -21,15 +21,16 @@ ENGINE_CONFIG = {
     "max_model_len": 4096,
     "enable_prefix_caching": False,
 }
-IMAGE = bentoml.images.PythonImage(python_version="3.11", lock_python_packages=False)
-IMAGE.requirements_file("requirements.txt")
+IMAGE = bentoml.images.PythonImage(
+    python_version="3.11", lock_python_packages=False, python_requirements="requirements.txt"
+)
 openai_api_app = fastapi.FastAPI()
 
 
 @bentoml.asgi_app(openai_api_app, path="/v1")
 @bentoml.service(
     name="bentovllm-ministral-8b-instruct-2410-service",
-    traffic={"timeout": 300},
+    traffic={"concurrency": 128, "timeout": 300},
     resources={"gpu": 1, "gpu_type": "nvidia-l4"},
     envs=[{"name": "HF_TOKEN"}],
     labels={"owner": "bentoml-team", "type": "prebuilt"},
@@ -183,8 +184,6 @@ class SearchAgentService:
             final_state = await self.app.ainvoke({"messages": [HumanMessage(content=input_query)]})
             return final_state["messages"][-1].content
         except OpenAIError as e:
-            print(f"An error occurred: {e}")
-            import traceback
-
-            print(traceback.format_exc())
+            logger.error(f"An error occurred: {e}")
+            logger.error(traceback.format_exc())
             return "I'm sorry, but I encountered an error while processing your request. Please try again later."

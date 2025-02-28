@@ -132,7 +132,7 @@ class SearchAgentService:
         tools = [search]
         self.tools = ToolNode(tools)
         self.model = ChatOpenAI(
-            model=ENGINE_CONFIG["model"],
+            model=LLM.inner.model_id,
             openai_api_key="N/A",
             openai_api_base=f"{self.llm_service.client_url}/v1",
             temperature=0,

@@ -4,17 +4,15 @@ from typing import AsyncGenerator
 
 from agent import workflow
 
+
 @bentoml.service(
     name="langgraph-anthropic-search-agent",
     workers=2,
-    resources={
-        "cpu": "2000m"
-    },
-    traffic={
-        "concurrency": 16,
-        "external_queue": True
-    },
-    image=bentoml.images.PythonImage(python_version='3.11', lock_python_packages=False).requirements_file('requirements.txt'),
+    resources={"cpu": "2000m"},
+    traffic={"concurrency": 16, "external_queue": True},
+    image=bentoml.images.PythonImage(python_version="3.11", lock_python_packages=False).requirements_file(
+        "requirements.txt"
+    ),
 )
 class SearchAgentService:
     def __init__(self):
@@ -23,20 +21,15 @@ class SearchAgentService:
     @bentoml.task
     async def invoke(
         self,
-        input_query: str="What is the weather in San Francisco today?",
+        input_query: str = "What is the weather in San Francisco today?",
     ) -> str:
-        final_state = await self.app.ainvoke(
-            {"messages": [HumanMessage(content=input_query)]}
-        )
+        final_state = await self.app.ainvoke({"messages": [HumanMessage(content=input_query)]})
         return final_state["messages"][-1].content
 
     @bentoml.api
     async def stream(
         self,
-        input_query: str="What is the weather in San Francisco today?",
+        input_query: str = "What is the weather in San Francisco today?",
     ) -> AsyncGenerator[str, None]:
-        async for event in self.app.astream_events(
-            {"messages": [HumanMessage(content=input_query)]},
-            version="v2"
-        ):
+        async for event in self.app.astream_events({"messages": [HumanMessage(content=input_query)]}, version="v2"):
             yield str(event) + "\n"

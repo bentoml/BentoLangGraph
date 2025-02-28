@@ -7,13 +7,14 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda
 from langchain_core.tools import tool
 
-EXA_API_KEY=os.environ.get("EXA_API_KEY")
+EXA_API_KEY = os.environ.get("EXA_API_KEY")
+
 
 @tool
 def retrieve_web_content(query: str) -> List[str]:
     """
     A wrapper around Exa Search.
-    Useful for when you need to retrieve web content to answer questions about current events, current weather, latest news, up-to-date information, etc. 
+    Useful for when you need to retrieve web content to answer questions about current events, current weather, latest news, up-to-date information, etc.
     Input should be a search query.
     """
     # Initialize the Exa Search retriever

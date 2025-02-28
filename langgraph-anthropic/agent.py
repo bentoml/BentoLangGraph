@@ -10,6 +10,7 @@ from langchain_core.messages import HumanMessage
 
 duckduckgo_search = DuckDuckGoSearchRun()
 
+
 @tool
 def search(query: str):
     """A wrapper around DuckDuckGo Search.
@@ -20,14 +21,16 @@ def search(query: str):
     res = duckduckgo_search.invoke({"query": query})
     return [res]
 
+
 tools = [search]
 tool_node = ToolNode(tools)
 
 model = ChatAnthropic(model="claude-3-7-sonnet-20250219", temperature=0).bind_tools(tools)
 
+
 # Define the function that determines whether to continue or not
 def should_continue(state: MessagesState) -> Literal["tools", END]:
-    messages = state['messages']
+    messages = state["messages"]
     last_message = messages[-1]
     # If the LLM makes a tool call, then we route to the "tools" node
     if last_message.tool_calls:
@@ -38,7 +41,7 @@ def should_continue(state: MessagesState) -> Literal["tools", END]:
 
 # Define the function that calls the model
 def call_model(state: MessagesState):
-    messages = state['messages']
+    messages = state["messages"]
     response = model.invoke(messages)
     # We return a list, because this will get added to the existing list
     return {"messages": [response]}
@@ -66,7 +69,7 @@ workflow.add_conditional_edges(
 
 # We now add a normal edge from `tools` to `agent`.
 # This means that after `tools` is called, `agent` node is called next.
-workflow.add_edge("tools", 'agent')
+workflow.add_edge("tools", "agent")
 
 
 if __name__ == "__main__":

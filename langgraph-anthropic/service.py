@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 from agent import workflow
 
 @bentoml.service(
+    name="langgraph-anthropic-search-agent",
     workers=2,
     resources={
         "cpu": "2000m"
@@ -12,7 +13,8 @@ from agent import workflow
     traffic={
         "concurrency": 16,
         "external_queue": True
-    }
+    },
+    image=bentoml.images.PythonImage(python_version='3.11', lock_python_packages=False).requirements_file('requirements.txt'),
 )
 class SearchAgentService:
     def __init__(self):
@@ -20,7 +22,7 @@ class SearchAgentService:
 
     @bentoml.task
     async def invoke(
-        self, 
+        self,
         input_query: str="What is the weather in San Francisco today?",
     ) -> str:
         final_state = await self.app.ainvoke(

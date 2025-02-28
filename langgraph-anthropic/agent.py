@@ -13,7 +13,7 @@ duckduckgo_search = DuckDuckGoSearchRun()
 @tool
 def search(query: str):
     """A wrapper around DuckDuckGo Search.
-    Useful for when you need to answer questions about current events, current weather, latest news, up-to-date information, etc. 
+    Useful for when you need to answer questions about current events, current weather, latest news, up-to-date information, etc.
     Input should be a search query.
     """
     print("### calling duckduckgo search")
@@ -23,7 +23,7 @@ def search(query: str):
 tools = [search]
 tool_node = ToolNode(tools)
 
-model = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0).bind_tools(tools)
+model = ChatAnthropic(model="claude-3-7-sonnet-20250219", temperature=0).bind_tools(tools)
 
 # Define the function that determines whether to continue or not
 def should_continue(state: MessagesState) -> Literal["tools", END]:

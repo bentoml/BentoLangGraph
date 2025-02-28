@@ -1,4 +1,4 @@
-bentoml
+bentoml>=1.4.1
 langgraph
 langchain-anthropic
 langchain-community

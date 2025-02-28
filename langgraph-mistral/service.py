@@ -167,12 +167,6 @@ class SearchAgentService:
         self.app = workflow.compile()
 
     @bentoml.api
-    async def query(
-        self, input_query: str = "What is the weather in San Francisco today?"
-    ) -> typing.Dict[str, typing.Any]:
-        return (await self.app.ainvoke({"messages": [HumanMessage(content=input_query)]}))["messages"][-1]
-
-    @bentoml.api
     async def stream(
         self,
         input_query: str = "What is the weather in San Francisco today?",

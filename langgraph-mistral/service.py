@@ -1,37 +1,100 @@
-from typing import Literal
-from typing import AsyncGenerator
-import random
-import string
+from __future__ import annotations
 
-import bentoml
+import logging, typing, uuid, random, string
+
+import bentoml, fastapi
 
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langgraph.graph import END, START, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
 from langchain_community.tools import DuckDuckGoSearchRun
-from langchain_core.messages import HumanMessage
-from langchain_core.messages import AIMessage
+from langchain_core.messages import HumanMessage, AIMessage
 from openai import OpenAIError
 
-from mistral import MistralService
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-duckduckgo_search = DuckDuckGoSearchRun()
+ENGINE_CONFIG = {
+    'model': 'mistralai/Ministral-8B-Instruct-2410',
+    'tokenizer_mode': 'mistral',
+    'max_model_len': 4096,
+    'enable_prefix_caching': False,
+}
+openai_api_app = fastapi.FastAPI()
+
+
+@bentoml.asgi_app(openai_api_app, path='/v1')
+@bentoml.service(
+    name='bentovllm-ministral-8b-instruct-2410-service',
+    traffic={'timeout': 300},
+    resources={'gpu': 1, 'gpu_type': 'nvidia-l4'},
+    envs=[{'name': 'HF_TOKEN'}],
+    labels={'owner': 'bentoml-team', 'type': 'prebuilt'},
+    image=bentoml.images.PythonImage(python_version='3.11', lock_python_packages=False).requirements_file('requirements.txt'),
+)
+class LLM:
+    model_id = ENGINE_CONFIG['model']
+    model = bentoml.models.HuggingFaceModel(model_id, exclude=['consolidated*', '*.pth', '*.pt'])
+
+    def __init__(self):
+        from openai import AsyncOpenAI
+
+        self.openai = AsyncOpenAI(base_url='http://127.0.0.1:3000/v1', api_key='dummy')
+
+    @bentoml.on_startup
+    async def init_engine(self) -> None:
+        import vllm.entrypoints.openai.api_server as vllm_api_server
+
+        from vllm.utils import FlexibleArgumentParser
+        from vllm.entrypoints.openai.cli_args import make_arg_parser
+
+        args = make_arg_parser(FlexibleArgumentParser()).parse_args([])
+        args.model = self.model
+        args.disable_log_requests = True
+        args.max_log_len = 1000
+        args.served_model_name = [self.model_id]
+        args.request_logger = None
+        args.disable_log_stats = True
+        for key, value in ENGINE_CONFIG.items():
+            setattr(args, key, value)
+
+        router = fastapi.APIRouter(lifespan=vllm_api_server.lifespan)
+        OPENAI_ENDPOINTS = [
+            ['/chat/completions', vllm_api_server.create_chat_completion, ['POST']],
+            ['/models', vllm_api_server.show_available_models, ['GET']],
+        ]
+
+        for route, endpoint, methods in OPENAI_ENDPOINTS:
+            router.add_api_route(path=route, endpoint=endpoint, methods=methods, include_in_schema=True)
+        openai_api_app.include_router(router)
+
+        self.engine_context = vllm_api_server.build_async_engine_client(args)
+        self.engine = await self.engine_context.__aenter__()
+        self.model_config = await self.engine.get_model_config()
+        self.tokenizer = await self.engine.get_tokenizer()
+        args.tool_call_parser = 'mistral'
+        args.enable_auto_tool_choice = True
+
+        await vllm_api_server.init_app_state(self.engine, self.model_config, openai_api_app.state, args)
+
+    @bentoml.on_shutdown
+    async def teardown_engine(self):
+        await self.engine_context.__aexit__(GeneratorExit, None, None)
 
 @tool
 def search(query: str):
     """A wrapper around DuckDuckGo Search.
-    Useful for when you need to answer questions about current events, current weather, latest news, up-to-date information, etc. 
+    Useful for when you need to answer questions about current events, current weather, latest news, up-to-date information, etc.
     Input should be a search query.
     """
+    duckduckgo_search = DuckDuckGoSearchRun()
     res = duckduckgo_search.invoke({"query": query})
+
     return [res]
 
-tools = [search]
-tool_node = ToolNode(tools)
-
 # Define the function that determines whether to continue or not
-def should_continue(state: MessagesState) -> Literal["tools", END]:
+def should_continue(state: MessagesState) -> typing.Literal["tools", END]:
     messages = state['messages']
     last_message = messages[-1]
     if last_message.tool_calls:
@@ -48,8 +111,8 @@ def generate_valid_tool_call_id():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=9))
 
 
-# Entry service defined in bentofile.yaml
 @bentoml.service(
+    name="langgraph-mistral-search-agent",
     workers=2,
     resources={
         "cpu": "2000m"
@@ -57,11 +120,13 @@ def generate_valid_tool_call_id():
     traffic={
         "concurrency": 16,
         "external_queue": True
-    }
+    },
+    labels={'owner': 'bentoml-team', 'project': 'langgraph-mistral'},
+    image=bentoml.images.PythonImage(python_version='3.11', lock_python_packages=False).requirements_file('requirements.txt'),
 )
 class SearchAgentService:
     # OpenAI compatible API
-    llm_service = bentoml.depends(MistralService)
+    llm_service = bentoml.depends(LLM)
 
     def __init__(self):
         tools = [search]
@@ -106,7 +171,7 @@ class SearchAgentService:
 
     @bentoml.task
     async def invoke(
-        self, 
+        self,
         input_query: str="What is the weather in San Francisco today?",
     ) -> str:
         try:
@@ -124,7 +189,7 @@ class SearchAgentService:
     async def stream(
         self,
         input_query: str="What is the weather in San Francisco today?",
-    ) -> AsyncGenerator[str, None]:
+    ) -> typing.AsyncGenerator[str, None]:
         async for event in self.app.astream_events(
             {"messages": [HumanMessage(content=input_query)]},
             version="v2"

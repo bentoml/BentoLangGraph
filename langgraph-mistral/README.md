@@ -1,10 +1,10 @@
-# LangGraph Agent with Mistral 7B
+# LangGraph Agent with Ministral 8B
 
-This project implements a LangGraph search agent powered by the Mistral 7B language model.
+This project implements a LangGraph search agent powered by the Ministral 8B language model.
 
 ## Overview
 
-- **AI Agent**: Utilizes LangGraph and Mistral 7B to build an AI agent that can search the web.
+- **AI Agent**: Utilizes LangGraph and Ministral 8B to build an AI agent that can search the web.
 - **API**: Provides a REST API for easy integration.
 - **Flexible Invocation**: Supports both synchronous and asynchronous (queue-based) interactions.
 - **Deployment Options**: Run locally or deploy to BentoCloud for scalability.

@@ -24,7 +24,7 @@ cd BentoLangGraph/
 Follow the step-by-step guide for serving & deploying LangGraph agents with BentoML:
 
 - [Anthropic Claude 3.5 Sonnet](langgraph-anthropic/)
-- [Mistral 7B Instruct](langgraph-mistral/)
+- [Ministral 8B](langgraph-mistral/)
 
 ## Troubleshoot
 

@@ -3,9 +3,9 @@ langchain-openai
 langchain-community
 duckduckgo-search
 accelerate==0.34.0
-bentoml>=1.4.2
+bentoml>=1.4.3
 openai>=1.61.0
-vllm==0.7.2
+vllm==0.7.3
 pyyaml
 fastapi
 Pillow

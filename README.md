@@ -2,13 +2,11 @@
 
 This repo demonstrates how to serve LangGraph agent application with BentoML.
 
-See [here](https://docs.bentoml.com/en/latest/examples/overview.html) for a full list of BentoML example projects.
-
 ## Overview
 
 - **AI Agent Serving**: Serving LangGraph Agent as REST API for easy integration
 - **Flexible Invocation**: Supports both synchronous and asynchronous (queue-based) interactions.
-- **Deployment Options**: Run locally or deploy to BentoCloud for scalability.
+- **Deployment Options**: Run locally or deploy to Docker or Kubernetes.
 - **LLM Deployment**: Use external LLM APIs or deploy open-source LLM together with the Agent API service
 
 This project serves as a reference implementation designed to be hackable, providing a  foundation for building and customizing your own AI agent solutions. 
@@ -48,4 +46,4 @@ Interested in using LangGraph with other open-source LLMs? Checkout [BentoVLLM](
 
 ## Community
 
-Join the [BentoML developer community](https://l.bentoml.com/join-slack) on Slack for more support and discussions!
+Join [our community forum](https://forum.modular.com/c/bento/31) for more support and discussions.

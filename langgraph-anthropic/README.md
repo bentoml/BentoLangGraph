@@ -7,7 +7,7 @@ This project implements a LangGraph agent powered by the Anthropic Claude 3.5 So
 - **AI Agent**: Utilizes LangGraph and Anthropic Claude 3.5 Sonnet to build an AI agent that can search the web.
 - **API**: Provides a REST API for easy integration.
 - **Flexible Invocation**: Supports both synchronous and asynchronous (queue-based) interactions.
-- **Deployment Options**: Run locally or deploy to BentoCloud for scalability.
+- **Deployment Options**: Run locally or deploy to Docker or Kubernetes.
 
 # Getting Started
 
@@ -125,32 +125,4 @@ curl -X POST http://localhost:3000/stream \
 {'event': 'on_tool_start', 'data': ...}
 {'event': 'on_tool_end', 'data': ...}
 ...
-```
-
-## Deploy to BentoCloud
-
-Login to BentoCloud:
-
-```bash
-pip install bentoml
-bentoml cloud login
-```
-
-Create secret:
-
-```bash
-bentoml secret create anthropic ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
-```
-
-Deploy:
-
-```bash
-bentoml deploy . --name search-agent --secret anthropic
-```
-
-Invoke the endpoint:
-
-```bash
-DEPLOYED_ENDPOINT=$(bentoml deployment get search-agent -o json | jq -r ".endpoint_urls[0]")
-python client.py --query "What's the weather in San Francisco today?" --url $DEPLOYED_ENDPOINT
 ```
